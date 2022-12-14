@@ -1,7 +1,7 @@
 % p_robust_MG01_solver runs the non-adaptive variant of the
 % a-posteriori-steered multigrid (APS-MG) solver developed in 
 % [Miraci, Papez, Vohralik. SIAM J. Sci. Comput. (2021)]
-% https://doi.org/10.1137/19M1275929 
+% https://doi.org/10.1137/20M1349503 
 %
 % Linear system: A*x_exact = F
 %
