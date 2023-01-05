@@ -1,14 +1,16 @@
-function [loc_mat, patches, hats] = fill_patch_wRAS_small_varp
+function fill_patch
 % function for gathering the local information associated with patches;
-% namely: value of hat function in DOFs associated with the patch ('hats'),
-% global index of DOFs on the patch ('patches'), and local stiffness
-% matrices ('loc_mat')
+% namely: value of hat function in DOFs associated with the patch ('hatfunction'),
+% global index of DOFs on the patch ('FEM0indices'), and Cholesky factors 
+% of local stiffness matrices ('loccholfactor')
 %
 % Jan Papez, Ani Miraci, December 2022
 %       APS-MG MATLAB package https://github.com/JanPapez/APS-MG
 
-global meshdata DOF2 J A ;
+global meshdata DOF2 J A patches;
 
+patches = struct([]);
+patches(1).elements = [];
 
 for j = 2:J
     
@@ -29,27 +31,21 @@ for j = 2:J
     [phia_finepatch, ~] = phikl_all(X,Y,1);
     phia_finepatch = phia_finepatch(:,[1 3 2]);
     
-    
     nc_j = meshdata(j).nc;
     Aj = A{j};
     
     psiaweight = zeros(DOF2(j).lastFEMindex, 1);
     
-    elements_of_patch_all = struct('element',cell(1,meshdata(j).nc));
-    for ell = 1:size(meshdata(j).elements,2)
-        for ell2 = 1:3
-            elements_of_patch_all(meshdata(j).elements(ell2,ell)).element(end+1) = ell;
-        end
-    end
+    % find the elements in the patch
+    patches(j).elements = find_patch_elements_counterclockwise(j);
     
-    loc = struct([]);
-    hat = struct([]);
-    patch = struct([]);
-    
+    locL = cell(nc_j,1);
+    hat = cell(nc_j,1);
+    patch = cell(nc_j,1);
     
     for index = 1:nc_j
         % indices of elements corresponding to the patch
-        elements_of_patch = elements_of_patch_all(index).element;
+        elements_of_patch = patches(j).elements{index};
         patchFEM0indices = index;
         
         for el = 1:length(elements_of_patch)
@@ -71,23 +67,21 @@ for j = 2:J
         psiaweight_local = psiaweight_local(patchFEM0indices>eps);
         patchFEM0indices = patchFEM0indices(patchFEM0indices>eps);
         
-        
-        hat(index).vertex = psiaweight_local;
-        
-        patch(index).vertex =  patchFEM0indices;
-        
         localstiffmatrix = Aj(patchFEM0indices,patchFEM0indices);
         [T,p] = chol(localstiffmatrix);
         if p ~= 0 %checking if Hermitian
             disp('error');
         end
         
-        loc(index).chol = T;
+        hat{index} = psiaweight_local;
+        patch{index} =  patchFEM0indices;
+        locL{index} = T;
         
     end
-    hats(j).level = hat;
-    patches(j).level = patch;
-    loc_mat(j).level = loc;
+    
+    patches(j).hatfunction = hat;
+    patches(j).FEM0indices = patch;
+    patches(j).loccholfactor = locL;
 end
 
 end
