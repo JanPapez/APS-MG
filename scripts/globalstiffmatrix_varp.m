@@ -8,7 +8,7 @@ function [A,F,localstiffmatrices,dJloc_all] = globalstiffmatrix_varp(j)
 global meshdata DOF2 ref_element solution;
 
 
-ref_elem = ref_element(j).level;
+ref_elem = ref_element{j};
 fh_coef = solution.fh_coef{j};
 
 nFEM = DOF2(j).nFEM;

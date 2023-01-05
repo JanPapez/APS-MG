@@ -11,7 +11,7 @@ function [fh_coef, osc] = project_f_varp(j)
 
 global meshdata DOF2 ref_element solution;
 
-ref_elem = ref_element(j).level;
+ref_elem = ref_element{j};
 
 fh_coef = zeros(DOF2(j).nFEM,meshdata(j).ne);
 osc = zeros(meshdata(j).ne,1);

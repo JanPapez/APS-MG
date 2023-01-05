@@ -9,7 +9,7 @@ function [rho, percentage_selected_iter] = W_adapt_smoother(xapprox,R,lam_local_
 %       APS-MG MATLAB package https://github.com/JanPapez/APS-MG
 
 global J A F;
-global prolong_matrices patches hats meshdata;
+global prolong_matrices patches meshdata;
 
 percentage_selected_iter = zeros(J,1);
 
@@ -71,8 +71,8 @@ for j = 2:J
         % smoothing on the marked patches only
         for index = I(:)'
             % indices of elements corresponding to the patch
-            patchFEM0indices = patches(j).level(index).vertex;
-            weights = hats(j).level(index).vertex;
+            patchFEM0indices = patches(j).FEM0indices{index};
+            weights = patches(j).hatfunction{index};
 
             localstiffmatrix = Aj(patchFEM0indices,patchFEM0indices);
             
