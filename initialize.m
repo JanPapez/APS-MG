@@ -15,15 +15,15 @@ addpath('scripts');
 % choice of the problem
 solution = solution_def(problem_number);
 
-% initial mesh
-fill_meshdata(Hmax,1);
-meshdata(1).I = [];
-
 ref_element = cell(J,1); osc = cell(J,1); A = cell(J,1); F = cell(J,1); x = cell(J,1);
 element = struct([]);
 
 %% coarsest level, j = 1
 j = 1;
+
+% initial mesh
+fill_meshdata(Hmax,1);
+meshdata(1).I = [];
 
 % indexing the degrees of freedom
 fill_DOF1(meshdata, m(1), j); 
@@ -33,9 +33,7 @@ fill_DOF2(meshdata, m(j), j);
 ref_element{j} = fill_ref_element(DOF2(j));
 
 % projecting rhs f as piece-wise polynomial and measuring the oscillations
-[tmp, tmp2] = project_f_varp(j);
-solution.fh_coef{j} = tmp;
-osc{j} = tmp2;
+[solution.fh_coef{j}, osc{j}] = project_f_varp(j);
 
 % assembling the stiffness matrix and the right-hand side
 [tempA,tempF,element(j).FEMstiffmatrix, element(j).dJloc] = globalstiffmatrix_varp(j);
@@ -79,7 +77,7 @@ for j = 2:J
     if m(j-1) == m(j)
         p_int = 1;
     else
-        p_int = p_interpolation(j); %polynomial interpolation matrix  degree
+        p_int = p_interpolation(j); %polynomial interpolation matrix
     end
     DOF2(j).Ip = p_int;
 
@@ -88,10 +86,10 @@ for j = 2:J
 
     if mesh_uniformity == 1 % uniform refinement into 4 congruent triangles
         [meshdata(j).I,meshdata(j-1).refine] = interpolation_matrix_varp(j,refined);
-        meshdata(j).I1 = interpolation_matrix1(j,refined); %interpolation matrix for construction of hat functions
+        %meshdata(j).I1 = interpolation_matrix1(j,refined); %interpolation matrix for construction of hat functions
     else
         [meshdata(j).I,meshdata(j-1).refine] = interpolation_matrix_varp_NVB(j,refined);
-        meshdata(j).I1 = interpolation_matrix1_NVB(j,refined); %interpolation matrix for construction of hat functions
+        %meshdata(j).I1 = interpolation_matrix1_NVB(j,refined); %interpolation matrix for construction of hat functions
     end
 
     % projecting rhs f as piece-wise polynomial and measuring the oscillations
