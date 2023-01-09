@@ -86,10 +86,8 @@ for j = 2:J
 
     if mesh_uniformity == 1 % uniform refinement into 4 congruent triangles
         [meshdata(j).I,meshdata(j-1).refine] = interpolation_matrix_varp(j,refined);
-        %meshdata(j).I1 = interpolation_matrix1(j,refined); %interpolation matrix for construction of hat functions
     else
         [meshdata(j).I,meshdata(j-1).refine] = interpolation_matrix_varp_NVB(j,refined);
-        %meshdata(j).I1 = interpolation_matrix1_NVB(j,refined); %interpolation matrix for construction of hat functions
     end
 
     % projecting rhs f as piece-wise polynomial and measuring the oscillations
